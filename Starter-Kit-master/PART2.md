@@ -10,20 +10,22 @@ Please provide the YouTube link to your [Video Demo](https://youtube.com).
 
 List all the features completed.
 
-1. Cool Feature #1
-2. Cool Feature #2
-3. *add more*
-
+1. Alien's movement.
+2. Ensure Alien stop when hit the the border.
+3. Alien will leave a trail after it moved.
+4. Help commands.
 ### To Do
 
 List all the features not yet done. Remove this section if there is no incomplete requirements.
 
-1. Cool Feature #1
-2. *add more*
+1. Alien and zombie attack.
+2. Save and Load game.
+3. Objects functions like pod, rock and etc.
+4. 
 
 ## Additional Features
 
-Describe the additional features that has been implemented.
+None
 
 ## Contributions
 
