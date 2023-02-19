@@ -1,6 +1,7 @@
 # Alien vs. Zombie
 
-"Protect urself from Alien"
+"Protect yourself from Zombies"
+
 Alien will spawn in the middle of the border and player will try to control the alien to beat all the zombies.
 Inside the border there's gonna be randomly generated objects that will help player to win against the zombies. 
 
