@@ -33,19 +33,21 @@ For example:
 
 ### Hong Yoong Shem       
 
-1. Randomly generate game board.
-2. *add more*
+1. Modify the user's help command.
+2. Compile code.
+3. Make the program more user friendly.
 
 ### Nurul Balqis Binti Ridzuwan   
 
-1. Zombie movement and attack behaviour.
-2. *add more*
+1. Spawn zombie on the board based on user input.
+2. Zombie on the board represent by number. 
+3. Alien movement and ensuring the alien doesn't move out of bound.
+4. Update the code so that the alien won't be overwritten by zombies on the board during initialization stage.
 
 ### Yong Qi Xiang 
 
-1. Implement all game objects.
-2. *add more*
+1. Implementation of help command.
 
 ## Problems Encountered & Solutions
 
-Describe the problems encountered and provide the solutions / plan for the solutions.
+We don't have enough time to implement the remaining functions. 
