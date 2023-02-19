@@ -43,7 +43,6 @@ For example:
 2. Generate the Alien in the middle of the border no matter whats the row/column. 
 3. Compile all the codes.
 4. Making the program more user friendly. 
-5. Generate 
 
 
 ### Nurul Balqis Binti Ridzuwan 
