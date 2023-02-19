@@ -16,6 +16,8 @@
 #include <string>
 #include <iomanip>
 #include <random>
+#include <map>
+#include <fstream>
 using namespace std;
 
 class Settings
@@ -34,9 +36,24 @@ class Gameboard
  //   int dimR_, dimC_;  r = rows, c = column, 
 
     public:
-    void init (int dimR, int dimC);
-    void displayBoard(int dimR, int dimC) const;
+    void init (int dimR, int dimC, int z);
+    void displayBoard(int dimR, int dimC);
+    void locateAlien(int &dimR, int &dimC, int &row, int &col);
+    void changeTrail(int &dimR, int &dimC);
+    void moveUp(int &dimR, int &dimC);
+    void moveDown(int &dimR, int &dimC);
+    void moveRight(int &dimR, int &dimC);
+    void moveLeft(int &dimR, int &dimC);
     
+};
+
+struct Zombie {
+    int health ;
+    int damage ;
+    int range;
+    int x;
+    int y;
+    int number;
 };
 
 
@@ -138,8 +155,6 @@ void Settings::changeData(int &numRows, int &numColumn, int &numZombie) //change
     cout << "Settings updated!" << endl << endl;
 }
 
-
-
 void Settings::CScreen()//clear screen
 {
     pf::Pause();
@@ -147,8 +162,9 @@ void Settings::CScreen()//clear screen
     cout << endl;
 }
 
-void Gameboard::init(int dimC, int dimR)
+void Gameboard::init(int dimC, int dimR, int z)
 {
+  vector<pair<int, int>> occupiedCells;
     char objects[] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', 'r', 'p', 'h', '^', '>', '<', 'v'};
     int noOfObjects = 14; // number of objects in the objects array
     // create dynamic 2D array using vector
@@ -158,21 +174,61 @@ void Gameboard::init(int dimC, int dimR)
     {
         map_[i].resize(dimC); // resize each row
     }
+
+    int centerX = dimC/2;
+    int centerY = dimR/2;
+    map_[centerY][centerX] = 'A';
     // put random characters into the vector array
     for (int i = 0; i < dimR; ++i)
     {
         for (int j = 0; j < dimC; ++j)
         {
-            int objNo = rand() % noOfObjects;
-            int centerX = dimC/2;
-            int centerY = dimR/2;
-
-            map_[centerY][centerX] = 'A';
-            map_[i][j] = objects[objNo];
+          if (i == centerY && j == centerX) {
+            continue; // skip 'A' cell
+        }
+          int objNo = rand() % noOfObjects;
+          map_[i][j] = objects[objNo];
         }
     }
+
+    //Zombie zombies[zombieIndex]; // Select zombie from th array of zombie
+    Zombie zombies[z];
+
+    for (int i = 0; i < z; i++) { //Assign Zombie position
+    int x = rand() % dimC;
+    int y = rand() % dimR;
+    zombies[i].x = x;
+    zombies[i].y = y;
+
+    // check if new random position is already occupied
+    bool isOccupied = false;
+    for (auto coord : occupiedCells) {
+        if ((coord.first == x && coord.second == y) || (centerY == y && centerX == x)) {
+            isOccupied = true;
+            break;
+        }
+    }
+    // if new random position is already occupied, generate a new random position
+    while (isOccupied) {
+        x = rand() % dimC;
+        y = rand() % dimR;
+
+        isOccupied = false;
+        for (auto coord : occupiedCells) {
+            if (coord.first == x && coord.second == y) {
+                isOccupied = true;
+                break;
+            }
+        }
+    }
+    // add new occupied cell coordinates to vector
+    occupiedCells.push_back({x, y});
+    zombies[i].number = i + 1;
+    map_[y][x] = '0' + zombies[i].number;
 }
-void Gameboard::displayBoard(int dimR, int dimC) const//to display board
+}
+
+void Gameboard::displayBoard(int dimR, int dimC) //to display board
 {
     cout << " --__--__--__--__--__--__--__--_" << endl;
     cout << " =       Alien Vs Zombie       =" << endl;
@@ -223,10 +279,174 @@ void Gameboard::displayBoard(int dimR, int dimC) const//to display board
     cout << endl << endl;
 }
 
+void Gameboard::locateAlien(int &dimR, int &dimC, int &row, int &col)
+{
+  for (int i = 0; i < dimR; i++) {
+    for (int j = 0; j < dimC; j++) {
+      if (map_[i][j] == 'A') {
+        row = i;
+        col = j;
+        return;
+      }
+    }
+  }
+}
+
+void Gameboard::changeTrail(int &dimR, int &dimC) {
+    char objects[] = {' ', ' ', ' ', 'r', 'p', 'h', '^', '>', '<', 'v'};
+    int noOfObjects = sizeof(objects) / sizeof(objects[0]);
+
+    // Find and change all the trails left by the alien
+    while (true) {
+        int trailRow = -1, trailCol = -1;
+
+        // Find the location of the next trail ('.') left by the alien
+        for (int i = 0; i < dimR; i++) {
+            for (int j = 0; j < dimC; j++) {
+                if (map_[i][j] == '.') {
+                    trailRow = i;
+                    trailCol = j;
+                    break;
+                }
+            }
+            if (trailRow != -1 && trailCol != -1) {
+                break;
+            }
+        }
+
+        // If no more trail is found, break the loop
+        if (trailRow == -1 || trailCol == -1) {
+            break;
+        }
+
+        // Change the trail to a random object from the objects array
+        int objNo = rand() % noOfObjects;
+        map_[trailRow][trailCol] = objects[objNo];
+    }
+}
+
+void Gameboard::moveUp(int &dimR, int &dimC)
+{
+  Settings sett;
+  int row, col;
+  locateAlien(dimR, dimC, row, col);
+
+  while (row > 0) {
+    map_[row][col] = '.';
+    row--;
+    map_[row][col] = 'A';
+    displayBoard(dimR, dimC);
+    sett.CScreen();
+  }
+  changeTrail(dimR, dimC);
+}
+
+void Gameboard::moveDown(int &dimR, int &dimC)
+{
+  Settings sett;
+  int row, col;
+  locateAlien(dimR, dimC, row, col);
+
+    while (row + 1 < dimR){
+    map_[row][col] = '.';
+    row++;
+    map_[row][col] = 'A';
+    displayBoard(dimR, dimC);
+    sett.CScreen();
+    }
+    changeTrail(dimR, dimC);
+}
+
+void Gameboard::moveRight(int &dimR, int &dimC)
+{
+  Settings sett;
+    int row, col;
+    locateAlien(dimR, dimC, row, col);
+
+    while (col + 1 < dimC){
+    map_[row][col] = '.';
+    col++;
+    map_[row ][col] = 'A';
+    displayBoard(dimR, dimC);
+    sett.CScreen();
+    }
+    changeTrail(dimR, dimC);
+}
+
+void Gameboard::moveLeft(int &dimR, int &dimC)
+{
+    Settings sett;
+    int row, col;
+    locateAlien(dimR, dimC, row, col);
+
+    while (col > 0){
+    map_[row][col] = '.';
+    col--;
+    map_[row ][col] = 'A';
+    displayBoard(dimR, dimC);
+    sett.CScreen();
+    }
+    changeTrail(dimR, dimC);
+}
+
+void displayZombieAttributes(Zombie zombies[], int numZombies) {
+    for (int i = 0; i < numZombies; i++) {
+        std::cout << "Zombie " << i+1 << " :- " << "  Health: " << zombies[i].health << "  Damage: " << zombies[i].damage  << "  Range: " << zombies[i].range << std::endl;
+        std::cout << std::endl;
+    }
+}
+void move(int numRows, int numColumn)
+{
+    char choice;
+    Settings settings;
+    Gameboard gameboard;
+		bool fin = false;
+
+    do
+    {
+    cout << "Enter w , a , s, d to move: ";
+    cin >> choice;
+    settings.CScreen();
+        switch (choice)
+        {
+            case 'w':
+            gameboard.moveUp(numRows,numColumn);
+            gameboard.displayBoard(numRows, numColumn);
+            break;
+
+            case 's':
+            gameboard.moveDown(numRows, numColumn);
+            gameboard.displayBoard(numRows, numColumn);
+            break;
+
+            case 'd':
+            gameboard.moveRight(numRows, numColumn);
+            gameboard.displayBoard(numRows, numColumn);
+            break;
+
+            case 'a':
+            gameboard.moveLeft(numRows, numColumn);
+            gameboard.displayBoard(numRows, numColumn);
+            break;
+
+            /*case 'c':
+            gameboard.change(numRows, numColumn);
+            break;*/
+
+            case 'q':
+            fin = true;
+            break;
+        }
+    }
+    while(!fin);
+}
+
+
 int test()
 {
     Settings settings;
     Gameboard gameboard;
+    bool fin= false;
     cout << endl;
     cout << "      Alien VS Zombies" << endl;
     cout << "'Protect urself from zombies!'" << endl;
@@ -235,7 +455,6 @@ int test()
 
     char choice;
     bool done = false;
-    string zombiesName[] = {"Zombie1", "Zombie2", "Zombie3", "Zombie4", "Zombie5", "Zombie6", "Zombie7", "Zombie8", "Zombie9"};
     int alienhp = 100;   // Alien Hp
     int aliendamage = 0; // Alien Damage
     int numRows = 5, numColumn = 9 , numZombie = 1 ;
@@ -271,22 +490,69 @@ int test()
     cout << endl;
     settings.CScreen();
     srand(time(NULL));
-    gameboard.init(numColumn,numRows);
-    gameboard.displayBoard(numRows, numColumn);
-    cout << endl;  
-    cout << "Alien Hp =" << alienhp << "\t"<< "Player Damage =" << aliendamage << endl;
-    for (int i = 0; i < numZombie ; i++)
-    {
-    int zombieshp = 100 + (rand() % 50);
-    int zombiedamage = 10 + (rand() % 20);
-    int zombiesattackrange = 1 + (rand() % 3);
-    cout << zombiesName[i]<<endl;
-    cout << "Zombie Hp =" << zombieshp << "\t"<< "Zombie Damage =" <<zombiedamage << "\t"<< "Zombie Attack Range =" << zombiesattackrange<<endl;
+    Zombie zombies[numZombie];
+    for (int i = 0; i < numZombie; i++) {
+    zombies[i].health = (20 + (rand() % 11)) / 5 * 5 * 10;
+    zombies[i].damage = (2 + (rand() % 4)) / 2 * 5;
+    zombies[i].range = 1 + (rand() % 3);
     }
+    gameboard.init(numColumn,numRows, numZombie);
+    gameboard.displayBoard(numRows, numColumn);
+    cout << endl;
+    cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
+    displayZombieAttributes(zombies, numZombie);
+    bool playerTurn = true;
+    do
+    {
+   if (playerTurn){
+    cout << "-->Please type 'h' for more available commands<--" << endl;
+    cout << "Type w , a , s , d to move"<< endl;
+    cout << "Command> ";
+    cin >> choice;
+    settings.CScreen();
+      switch (choice)
+      {
+          case 'w':
+          gameboard.moveUp(numRows,numColumn);
+          break;
+
+          case 's':
+          gameboard.moveDown(numRows, numColumn);
+          break;
+
+          case 'd':
+          gameboard.moveRight(numRows, numColumn);
+          break;
+
+          case 'a':
+          gameboard.moveLeft(numRows, numColumn);
+          break;
+
+          case 'h':
+          
+
+          case 'q':
+          fin = true;
+          break;
+      }
+      gameboard.displayBoard(numRows, numColumn);
+      cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
+      displayZombieAttributes(zombies, numZombie);
+      playerTurn = false;
+      }
+      else
+      {
+        cout << "Zombies turn!" << endl;
+        settings.CScreen();
+        gameboard.displayBoard(numRows, numColumn);
+        cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
+        displayZombieAttributes(zombies, numZombie);
+        playerTurn = true;
+      }
+    } while (!fin);
+      cout << endl;
     return 0;
-
 }
-
 
 int main()
 {
@@ -333,4 +599,3 @@ int main()
     }
     while(choice !=3);
 }
-
