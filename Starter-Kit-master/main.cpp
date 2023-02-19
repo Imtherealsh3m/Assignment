@@ -448,7 +448,7 @@ int test()
     bool fin= false;
     cout << endl;
     cout << "      Alien VS Zombies" << endl;
-    cout << "'Protect urself from zombies!'" << endl;
+    cout << "'Protect yourself from zombies!'" << endl;
     cout << endl;
     settings.CScreen();
 
