@@ -21,7 +21,7 @@ List all the features not yet done. Remove this section if there is no incomplet
 1. Alien and zombie attack.
 2. Save and Load game.
 3. Objects functions like pod, rock and etc.
-4. 
+4. Change direction of arrow.
 
 ## Additional Features
 
