@@ -441,7 +441,6 @@ void move(int numRows, int numColumn)
     while(!fin);
 }
 
-
 int test()
 {
     Settings settings;
@@ -501,56 +500,63 @@ int test()
     cout << endl;
     cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
     displayZombieAttributes(zombies, numZombie);
-    bool playerTurn = true;
     do
     {
-   if (playerTurn){
     cout << "-->Please type 'h' for more available commands<--" << endl;
     cout << "Type w , a , s , d to move"<< endl;
     cout << "Command> ";
     cin >> choice;
     settings.CScreen();
-      switch (choice)
-      {
-          case 'w':
-          gameboard.moveUp(numRows,numColumn);
-          break;
+        switch (choice)
+        {
+            case 'w':
+            gameboard.moveUp(numRows,numColumn);
+            gameboard.displayBoard(numRows, numColumn);
+            cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
+            displayZombieAttributes(zombies, numZombie);
+            break;
 
-          case 's':
-          gameboard.moveDown(numRows, numColumn);
-          break;
+            case 's':
+            gameboard.moveDown(numRows, numColumn);
+            gameboard.displayBoard(numRows, numColumn);
+            cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
+            displayZombieAttributes(zombies, numZombie);
+            break;
 
-          case 'd':
-          gameboard.moveRight(numRows, numColumn);
-          break;
+            case 'd':
+            gameboard.moveRight(numRows, numColumn);
+            gameboard.displayBoard(numRows, numColumn);
+            cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
+            displayZombieAttributes(zombies, numZombie);
+            break;
 
-          case 'a':
-          gameboard.moveLeft(numRows, numColumn);
-          break;
+            case 'a':
+            gameboard.moveLeft(numRows, numColumn);
+            gameboard.displayBoard(numRows, numColumn);
+            cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
+            displayZombieAttributes(zombies, numZombie);
+            break;
 
-          case 'h':
-          
+            case 'h':
+            gameboard.displayBoard(numRows, numColumn);
+            cout <<"1. w         - Move up." << endl;
+            cout <<"2. s         - Move down."<< endl;
+            cout <<"3. a         - Move left."<< endl;
+            cout <<"4. d         - Move right."<< endl;
+            cout <<"5. arrow     - Change the direction of an arrow."<< endl;
+            cout <<"6. h         - Display these user commands."<< endl;
+            cout <<"7. save      - Save the game."<< endl;
+            cout <<"8. load      - Load a game."<< endl;
+            cout <<"9. q         - Quit the game."<< endl;
+            cout << endl;
+            break;
 
-          case 'q':
-          fin = true;
-          break;
-      }
-      gameboard.displayBoard(numRows, numColumn);
-      cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
-      displayZombieAttributes(zombies, numZombie);
-      playerTurn = false;
-      }
-      else
-      {
-        cout << "Zombies turn!" << endl;
-        settings.CScreen();
-        gameboard.displayBoard(numRows, numColumn);
-        cout << "Alien :-  HP =" << alienhp << "\t"<< "Damage =" << aliendamage << endl;
-        displayZombieAttributes(zombies, numZombie);
-        playerTurn = true;
-      }
-    } while (!fin);
-      cout << endl;
+            case 'q':
+            fin = true;
+            break;
+        }
+    }
+    while(!fin);
     return 0;
 }
 
